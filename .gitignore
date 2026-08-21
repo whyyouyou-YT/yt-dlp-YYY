@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# PyInstaller
+build/
+dist/
+
+# Inno Setup
+installer_dist/
+
+# 過去ビルドの手動アーカイブ(Releasesで配布するためgit管理不要)
+build_artifacts/
+
+# 同梱用ffmpeg(ライセンス上コミットしない。READMEの手順で別途取得)
+vendor/ffmpeg/ffmpeg.exe
+vendor/ffmpeg/ffprobe.exe
+
+# エディタ・OS
+.vscode/
+.idea/
+Thumbs.db
