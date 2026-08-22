@@ -2,7 +2,7 @@
 ; ビルド: "C:\Users\yuuma\AppData\Local\Programs\Inno Setup 6\ISCC.exe" installer.iss
 
 #define MyAppName "yt-dlp-YYY"
-#define MyAppVersion "1.5.3"
+#define MyAppVersion "1.5.4"
 #define MyAppExeName "yt-dlp-YYY.exe"
 #define MyAppSourceExe "dist\yt-dlp-YYY.exe"
 

@@ -6,6 +6,7 @@ from datetime import datetime
 from pathlib import Path
 
 import yt_dlp
+from yt_dlp.utils import DownloadCancelled as _YtDlpDownloadCancelled
 
 from app.settings import app_data_dir
 
@@ -40,8 +41,15 @@ _RETRYABLE_MARKERS = (
 )
 
 
-class DownloadCancelled(Exception):
-    pass
+class DownloadCancelled(_YtDlpDownloadCancelled):
+    """yt_dlp.utils.DownloadCancelledのサブクラスにする必要がある。
+
+    素のExceptionのままだと、プレイリストダウンロード時(ignoreerrors=True)に
+    yt-dlp内部の_handle_extraction_exceptionsがこの例外をyt_dlp自身のDownloadCancelled
+    と別物として扱い、ignoreerrorsにより握りつぶしてしまう。その結果キャンセルボタンを
+    押しても現在のエントリだけがエラー扱いになり、次のプレイリストエントリの処理が
+    継続してしまう（キャンセルが効かない）。
+    """
 
 
 def get_ffmpeg_dir() -> Path:

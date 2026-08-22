@@ -23,7 +23,7 @@ from app.history import add_history_entry, clear_history, load_history
 from app.settings import load_settings, save_settings
 from app.sound import play_complete_sound
 
-APP_VERSION = "v1.5.3"
+APP_VERSION = "v1.5.4"
 
 ICON_PATH = (
     Path(sys._MEIPASS) / "assets" / "icons" / "rounded_y_logo.ico"
