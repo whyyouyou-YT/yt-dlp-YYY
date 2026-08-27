@@ -20,6 +20,8 @@ yt-dlpを使ってYouTubeの動画+音声をダウンロードするGUIソフト
 
 UIフォントはNoto Sans JP(`assets/fonts/`に同梱、実行時にWindowsへ一時登録)。
 
+同梱している第三者ソフトウェア(ffmpeg/yt-dlp/yt-dlp-ejs/CustomTkinter/Noto Sans JP)のライセンス表記は`LICENSES.txt`にまとめている。インストーラー経由でインストールした場合、`LICENSES.txt`と`LICENSE-ffmpeg-GPLv3.txt`がインストール先フォルダにコピーされる。
+
 ## 開発環境での実行
 
 ```
@@ -29,6 +31,10 @@ python app/main.py
 
 ## exeのビルド方法
 
+0. バージョンを上げる場合は、リリース前に以下3箇所を揃えて更新する
+   - `app/main.py` の `APP_VERSION`
+   - `installer.iss` の `MyAppVersion`
+   - `version_info.txt` の `filevers`/`prodvers`/`FileVersion`/`ProductVersion`
 1. `vendor/ffmpeg/ffmpeg.exe` と `vendor/ffmpeg/ffprobe.exe` を配置する
    (Windows用静的ビルド: https://www.gyan.dev/ffmpeg/builds/ の essentials build から `bin/ffmpeg.exe` と `bin/ffprobe.exe` を取得)
 2. 依存パッケージをインストール
@@ -71,9 +77,11 @@ app/
   sound.py       完了通知音の再生 (winsound.MessageBeep)
   settings.py    設定の保存/読込 (%APPDATA%/yt-dlp-YYY/settings.json、テーマ設定も含む)
   fonts.py       Noto Sansのランタイム登録 (GDIへ一時フォント登録)
-vendor/ffmpeg/   同梱用ffmpeg.exe / ffprobe.exe (gitには含めない想定)
-assets/fonts/    同梱用Noto Sans (Regular/Bold, OFLライセンス)
+vendor/ffmpeg/   同梱用ffmpeg.exe / ffprobe.exe (gitには含めない想定) / LICENSE.txt (GPLv3全文)
+assets/fonts/    同梱用Noto Sans (Regular/Bold, OFL.txt)
 assets/icons/    実行ファイルアイコン (rounded_y_logo.ico)
-build.spec       PyInstaller設定 (ffmpeg・フォント・アイコン同梱・単一exe・コンソール非表示)
+build.spec       PyInstaller設定 (ffmpeg・フォント・アイコン・バージョンリソース同梱・単一exe・コンソール非表示)
+version_info.txt exeのバージョンリソース定義 (会社名/製品名/バージョン等、リリースごとに更新)
 installer.iss    Inno Setupインストーラー定義
+LICENSES.txt     同梱している第三者ソフトウェア・フォントのライセンス表記
 ```

@@ -1,0 +1,112 @@
+yt-dlp-YYY 同梱物 ライセンス表記
+================================
+
+本ソフトウェア(yt-dlp-YYY)は以下のサードパーティ製ソフトウェア・フォントを同梱しています。
+各コンポーネントの著作権はそれぞれの権利者に帰属します。
+
+
+------------------------------------------------------------
+1. ffmpeg / ffprobe (vendor/ffmpeg/ffmpeg.exe, vendor/ffmpeg/ffprobe.exe)
+------------------------------------------------------------
+配布元 : gyan.dev Windows builds (https://www.gyan.dev/ffmpeg/builds/) essentials build
+著作権 : FFmpeg開発チーム (https://ffmpeg.org/)
+ライセンス : GNU General Public License version 3 (GPLv3)
+
+FFmpegはffmpeg.exe / ffprobe.exeとして別プロセスで実行される形で同梱しており、
+yt-dlp-YYY本体のソースコードと結合(リンク)しているものではありません。
+GPLv3の全文は同梱の vendor/ffmpeg/LICENSE.txt を参照してください。
+
+GPLv3が要求する対応するソースコードは、gyan.devのビルドページ
+(https://www.gyan.dev/ffmpeg/builds/) からFFmpeg本体のソースパッケージとして
+無償で入手可能です。
+
+
+------------------------------------------------------------
+2. yt-dlp (Python パッケージ、exe内に同梱)
+------------------------------------------------------------
+配布元 : https://github.com/yt-dlp/yt-dlp
+著作権 : yt-dlp contributors
+ライセンス : The Unlicense
+
+This is free and unencumbered software released into the public domain.
+
+Anyone is free to copy, modify, publish, use, compile, sell, or
+distribute this software, either in source code form or as a compiled
+binary, for any purpose, commercial or non-commercial, and by any
+means.
+
+In jurisdictions that recognize copyright laws, the author or authors
+of this software dedicate any and all copyright interest in the
+software to the public domain. We make this dedication for the benefit
+of the public at large and to the detriment of our heirs and
+successors. We intend this dedication to be an overt act of
+relinquishment in perpetuity of all present and future rights to this
+software under copyright law.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+For more information, please refer to <https://unlicense.org/>
+
+
+------------------------------------------------------------
+3. yt-dlp-ejs (Python パッケージ、exe内に同梱)
+------------------------------------------------------------
+配布元 : https://github.com/yt-dlp/ejs
+著作権 : yt-dlp contributors ほか
+ライセンス : Unlicense AND MIT AND ISC (パッケージ全体はUnlicense、内部で使用する
+             一部JavaScript関連コンポーネントにMIT/ISCライセンスのものを含む)
+
+主要な条件はyt-dlp本体と同じUnlicense(上記2.参照)です。詳細な内訳は
+配布元リポジトリを参照してください。
+
+
+------------------------------------------------------------
+4. CustomTkinter (Python パッケージ、exe内に同梱)
+------------------------------------------------------------
+配布元 : https://github.com/TomSchimansky/CustomTkinter
+著作権 : Copyright (c) 2023 Tom Schimansky
+ライセンス : MIT License
+
+MIT License
+
+Copyright (c) 2023 Tom Schimansky
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+------------------------------------------------------------
+5. Noto Sans JP (assets/fonts/NotoSansJP-Regular.ttf, NotoSansJP-Bold.ttf)
+------------------------------------------------------------
+配布元 : Google Fonts (https://fonts.google.com/noto/specimen/Noto+Sans+JP)
+著作権 : Copyright 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'
+ライセンス : SIL Open Font License, Version 1.1 (OFL-1.1)
+
+全文は同梱の assets/fonts/OFL.txt を参照してください。
+
+
+------------------------------------------------------------
+6. アプリアイコン (assets/icons/rounded_y_logo.ico)
+------------------------------------------------------------
+本人(yuuma)によるオリジナル作成物であり、第三者ライセンスの対象外です。

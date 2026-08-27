@@ -57,4 +57,5 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
     icon="assets/icons/rounded_y_logo.ico",
+    version="version_info.txt",
 )

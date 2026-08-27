@@ -31,6 +31,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "{#MyAppSourceExe}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "LICENSES.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "vendor\ffmpeg\LICENSE.txt"; DestDir: "{app}"; DestName: "LICENSE-ffmpeg-GPLv3.txt"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
