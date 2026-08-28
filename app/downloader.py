@@ -1,5 +1,6 @@
 import queue
 import sys
+import tempfile
 import threading
 import traceback
 from datetime import datetime
@@ -11,6 +12,16 @@ from yt_dlp.utils import DownloadCancelled as _YtDlpDownloadCancelled
 from app.settings import app_data_dir
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+
+# Pythonのtempfileはtempdir解決に失敗すると最終フォールバックとしてカレント
+# ディレクトリを使う。Inno Setupのショートカットは既定でWorkingDir未指定のため、
+# インストール先(Program Files配下、管理者権限が必要)がカレントディレクトリに
+# なり、そこへの一時ファイル書き込みがPermissionErrorになる不具合があった。
+# yt-dlp内部の一時ファイル書き込み全般に影響するため、確実に書き込み可能な
+# %APPDATA%配下をプロセス全体のtempfile既定値として明示的に固定する。
+_TMP_DIR = app_data_dir() / "tmp"
+_TMP_DIR.mkdir(parents=True, exist_ok=True)
+tempfile.tempdir = str(_TMP_DIR)
 
 KIND_OPTIONS = ["映像+音声", "映像のみ", "音声のみ"]
 QUALITY_OPTIONS = ["最高品質", "1080p", "720p", "480p"]
@@ -118,6 +129,7 @@ def common_opts(player_client=None) -> dict:
     opts = {
         "ffmpeg_location": str(get_ffmpeg_dir()),
         "js_runtimes": dict(JS_RUNTIMES),
+        "cachedir": str(app_data_dir() / "cache"),
         "quiet": True,
         "no_warnings": True,
     }

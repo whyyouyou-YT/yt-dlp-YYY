@@ -6,8 +6,8 @@
 
 VSVersionInfo(
   ffi=FixedFileInfo(
-    filevers=(1, 5, 4, 0),
-    prodvers=(1, 5, 4, 0),
+    filevers=(1, 5, 5, 0),
+    prodvers=(1, 5, 5, 0),
     mask=0x3f,
     flags=0x0,
     OS=0x40004,
@@ -22,12 +22,12 @@ VSVersionInfo(
         u'041104b0',
         [StringStruct(u'CompanyName', u'yuuma'),
         StringStruct(u'FileDescription', u'yt-dlp-YYY ダウンローダー'),
-        StringStruct(u'FileVersion', u'1.5.4.0'),
+        StringStruct(u'FileVersion', u'1.5.5.0'),
         StringStruct(u'InternalName', u'yt-dlp-YYY'),
         StringStruct(u'LegalCopyright', u'Copyright (c) yuuma'),
         StringStruct(u'OriginalFilename', u'yt-dlp-YYY.exe'),
         StringStruct(u'ProductName', u'yt-dlp-YYY'),
-        StringStruct(u'ProductVersion', u'1.5.4.0')])
+        StringStruct(u'ProductVersion', u'1.5.5.0')])
       ]),
     VarFileInfo([VarStruct(u'Translation', [1041, 1200])])
   ]
