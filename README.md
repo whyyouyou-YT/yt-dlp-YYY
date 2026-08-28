@@ -66,6 +66,41 @@ Inno Setup 6が必要(`winget install --id JRSoftware.InnoSetup -e`で導入可�
 
 4. `installer_dist\yt-dlp-YYY-Setup-v<バージョン>.exe` が生成される。スタートメニュー登録・デスクトップアイコン任意作成・アンインストーラー付き
 
+## アップデーターのビルド方法（既にインストール済みの人向け）
+
+フルインストーラー（ffmpeg等を含み数十MB）を落とし直さず、本体exeだけを最新版に差し替える軽量ツール。
+yt_dlp/customtkinter等は使わず標準ライブラリのみなので `dist/yt-dlp-YYY.exe` よりずっと軽い。
+
+```
+python -m PyInstaller updater.spec --noconfirm
+```
+
+`dist/yt-dlp-YYY-Updater.exe` が生成される。GitHub Release に本体exe・インストーラーと
+並べてアップロードする。
+
+**使い方（利用者側）**: `yt-dlp-YYY-Updater.exe` をそのまま実行するだけ。インストール先は
+レジストリのアンインストール情報から自動検出し、GitHub の最新Releaseから本体exeだけを
+ダウンロードして上書きする。実行中は置き換えできないため、事前にアプリを閉じておくこと。
+書き込み権限が無い場合は自動的に管理者権限で再起動する。
+
+### リポジトリがPrivateの間のアクセス（知り合いに使ってもらう場合）
+
+このリポジトリは現在Privateのため、GitHub Releases APIへの匿名アクセスは404になる。
+知り合いにアップデーターを使ってもらうには、読み取り専用スコープのアクセストークンを
+発行して渡す必要がある。
+
+1. GitHubの [Settings > Developer settings > Fine-grained tokens](https://github.com/settings/tokens?type=beta) で新規発行
+   - Repository access: `Only select repositories` → `yt-dlp-YYY` のみ選択
+   - Permissions: `Contents` を `Read-only` に設定（それ以外は付与しない）
+   - 有効期限は必要に応じて短めに設定（失効すればいつでも同じ手順で再発行できる）
+2. 発行されたトークン文字列（`github_pat_...`）を、渡したい相手にDiscord DM等の安全な経路で共有する
+3. 相手は `yt-dlp-YYY-Updater.exe` と同じフォルダに `token.txt` という名前のテキストファイルを作り、
+   トークンだけを1行貼り付けて保存してから実行する（環境変数 `YT_DLP_YYY_UPDATER_TOKEN` でも可）
+4. リポジトリを将来Publicにした場合は `token.txt` は不要になる（無くてもそのまま動く）
+
+トークンはリポジトリ単位・読み取り専用でスコープを絞ってあるため、漏れても実害は小さいが、
+不要になったらGitHub側でいつでも失効させること。
+
 ## ディレクトリ構成
 
 ```
@@ -83,5 +118,6 @@ assets/icons/    実行ファイルアイコン (rounded_y_logo.ico)
 build.spec       PyInstaller設定 (ffmpeg・フォント・アイコン・バージョンリソース同梱・単一exe・コンソール非表示)
 version_info.txt exeのバージョンリソース定義 (会社名/製品名/バージョン等、リリースごとに更新)
 installer.iss    Inno Setupインストーラー定義
+updater.py / updater.spec 既存インストールを最新Releaseの本体exeに差し替える軽量アップデーター。標準ライブラリのみで完結
 LICENSES.txt     同梱している第三者ソフトウェア・フォントのライセンス表記
 ```
