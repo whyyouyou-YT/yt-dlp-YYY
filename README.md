@@ -20,7 +20,7 @@ yt-dlpを使ってYouTubeの動画+音声をダウンロードするGUIソフト
 
 UIフォントはNoto Sans JP(`assets/fonts/`に同梱、実行時にWindowsへ一時登録)。
 
-同梱している第三者ソフトウェア(ffmpeg/yt-dlp/yt-dlp-ejs/CustomTkinter/Noto Sans JP)のライセンス表記は`LICENSES.txt`にまとめている。インストーラー経由でインストールした場合、`LICENSES.txt`と`LICENSE-ffmpeg-GPLv3.txt`がインストール先フォルダにコピーされる。
+本体コードのライセンスはMIT(`LICENSE`参照)。同梱している第三者ソフトウェア(ffmpeg/yt-dlp/yt-dlp-ejs/CustomTkinter/Noto Sans JP)のライセンス表記は`LICENSES.txt`にまとめている。インストーラー経由でインストールした場合、`LICENSES.txt`と`LICENSE-ffmpeg-GPLv3.txt`がインストール先フォルダにコピーされる。
 
 ## 開発環境での実行
 
