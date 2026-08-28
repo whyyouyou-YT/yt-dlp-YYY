@@ -1,4 +1,16 @@
 import os
+
+# インストーラー版はProgram Files配下(管理者権限が必要)にインストールされ、
+# ショートカットはWorkingDir未指定のためそこがカレントディレクトリになる。
+# yt-dlp・依存ライブラリ・子プロセス(node等)はcwdへの相対パス書き込みに
+# 依存する箇所があり、それが原因で情報取得時にPermissionErrorになる不具合が
+# あった(個別のtempfile呼び出し単位で塞いでも別経路で再発したため、
+# 他の一切のimportより前にプロセス全体のcwdを確実に書き込み可能な場所へ
+# 固定することで、この種の不具合を経路に依らず解消する)。
+_WRITABLE_DIR = os.path.join(os.environ.get("APPDATA") or os.path.expanduser("~"), "yt-dlp-YYY")
+os.makedirs(_WRITABLE_DIR, exist_ok=True)
+os.chdir(_WRITABLE_DIR)
+
 import queue
 import sys
 import threading
@@ -23,7 +35,7 @@ from app.history import add_history_entry, clear_history, load_history
 from app.settings import load_settings, save_settings
 from app.sound import play_complete_sound
 
-APP_VERSION = "v1.5.5"
+APP_VERSION = "v1.5.5.1"
 
 ICON_PATH = (
     Path(sys._MEIPASS) / "assets" / "icons" / "rounded_y_logo.ico"
