@@ -34,8 +34,9 @@ from app.fonts import FONT_FAMILY, load_custom_fonts
 from app.history import add_history_entry, clear_history, load_history
 from app.settings import load_settings, save_settings
 from app.sound import play_complete_sound
+from app.winutil import is_admin, relaunch_as_admin
 
-APP_VERSION = "v1.5.5.1"
+APP_VERSION = "v1.6.0"
 
 ICON_PATH = (
     Path(sys._MEIPASS) / "assets" / "icons" / "rounded_y_logo.ico"
@@ -55,7 +56,7 @@ ctk.set_default_color_theme("blue")
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.title(f"yt-dlp-YYY ダウンローダー {APP_VERSION}")
+        self.title(f"yt-dlp-YYY ダウンローダー {APP_VERSION}" + ("（管理者）" if is_admin() else ""))
         self.geometry("700x600")
         self.minsize(620, 540)
         if ICON_PATH.exists():
@@ -238,6 +239,14 @@ class App(ctk.CTk):
         footer_frame = ctk.CTkFrame(self, fg_color="transparent")
         footer_frame.pack(fill="x", padx=12, pady=(0, 8))
         ctk.CTkLabel(footer_frame, text=APP_VERSION, font=self.font_small, text_color="gray60").pack(side="right")
+        if is_admin():
+            ctk.CTkLabel(footer_frame, text="管理者", font=self.font_small, text_color="gray60").pack(side="left")
+        else:
+            ctk.CTkButton(
+                footer_frame, text="管理者権限で開き直す", width=160, font=self.font_small,
+                fg_color="transparent", border_width=1, text_color=("gray20", "gray80"),
+                command=self._request_admin
+            ).pack(side="left")
 
     def _on_kind_change(self, value):
         self.quality_menu.configure(state="disabled" if is_audio_only(value) else "normal")
@@ -522,6 +531,12 @@ class App(ctk.CTk):
         if self.is_downloading:
             self.downloader.cancel()
         self.destroy()
+
+    def _request_admin(self):
+        if self.is_downloading:
+            self.downloader.cancel()
+        if relaunch_as_admin():
+            self.after(400, lambda: os._exit(0))
 
 
 def main():
