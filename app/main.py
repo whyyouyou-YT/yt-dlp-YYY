@@ -29,6 +29,7 @@ from app.downloader import (
     Downloader,
     container_options_for_kind,
     is_audio_only,
+    is_thumbnail_only,
 )
 from app.fonts import FONT_FAMILY, load_custom_fonts
 from app.history import add_history_entry, clear_history, load_history
@@ -36,7 +37,7 @@ from app.settings import load_settings, save_settings
 from app.sound import play_complete_sound
 from app.winutil import is_admin, relaunch_as_admin
 
-APP_VERSION = "v1.6.0"
+APP_VERSION = "v1.7.0"
 
 ICON_PATH = (
     Path(sys._MEIPASS) / "assets" / "icons" / "rounded_y_logo.ico"
@@ -232,6 +233,14 @@ class App(ctk.CTk):
         )
         self.play_sound_check.pack(side="left", padx=(4, 8), pady=4)
 
+        self.save_thumbnail_var = ctk.BooleanVar(value=self.settings.get("save_thumbnail", False))
+        self.save_thumbnail_check = ctk.CTkCheckBox(
+            extra_frame, text="サムネイルも保存(jpg)", font=self.font_normal,
+            variable=self.save_thumbnail_var, command=self._on_save_thumbnail_toggle
+        )
+        self.save_thumbnail_check.pack(side="left", padx=(0, 8), pady=4)
+        self._on_kind_change(self.kind_var.get())
+
         ctk.CTkButton(
             extra_frame, text="履歴", width=80, font=self.font_normal, command=self._open_history_window
         ).pack(side="left", padx=(8, 0), pady=4)
@@ -249,12 +258,19 @@ class App(ctk.CTk):
             ).pack(side="left")
 
     def _on_kind_change(self, value):
-        self.quality_menu.configure(state="disabled" if is_audio_only(value) else "normal")
+        no_quality = is_audio_only(value) or is_thumbnail_only(value)
+        self.quality_menu.configure(state="disabled" if no_quality else "normal")
 
         new_options = container_options_for_kind(value)
         self.container_menu.configure(values=new_options)
         if self.container_var.get() not in new_options:
             self.container_var.set(new_options[0])
+        self.container_menu.configure(state="disabled" if is_thumbnail_only(value) else "normal")
+
+        # サムネイルのみのときは「サムネイルも保存」は意味を持たない(常に保存する)ので無効化
+        thumb_check = getattr(self, "save_thumbnail_check", None)
+        if thumb_check is not None:
+            thumb_check.configure(state="disabled" if is_thumbnail_only(value) else "normal")
 
     def _apply_log_visibility(self, visible: bool):
         if visible:
@@ -286,6 +302,10 @@ class App(ctk.CTk):
 
     def _on_auto_copy_toggle(self):
         self.settings["auto_copy_clipboard"] = self.auto_copy_var.get()
+        save_settings(self.settings)
+
+    def _on_save_thumbnail_toggle(self):
+        self.settings["save_thumbnail"] = self.save_thumbnail_var.get()
         save_settings(self.settings)
 
     def _on_play_sound_toggle(self):
@@ -352,12 +372,13 @@ class App(ctk.CTk):
         self._log(f"ダウンロード開始: {url}")
         self._set_downloading_state(True)
 
+        save_thumbnail = self.save_thumbnail_var.get()
         thread = threading.Thread(
-            target=self._worker, args=(url, output_dir, kind, quality, container), daemon=True
+            target=self._worker, args=(url, output_dir, kind, quality, container, save_thumbnail), daemon=True
         )
         thread.start()
 
-    def _worker(self, url, output_dir, kind, quality, container):
+    def _worker(self, url, output_dir, kind, quality, container, save_thumbnail=False):
         try:
             info = self.downloader.probe(url)
         except Exception as exc:
@@ -366,7 +387,9 @@ class App(ctk.CTk):
         target_kind = "プレイリスト" if info["is_playlist"] else "動画"
         self._pending_meta["title"] = info["title"]
         self.progress_queue.put(("status", f"{target_kind}を処理中: {info['title']}"))
-        self.downloader.download(url, output_dir, kind, quality, container, info["is_playlist"])
+        self.downloader.download(
+            url, output_dir, kind, quality, container, info["is_playlist"], save_thumbnail
+        )
 
     def _cancel_download(self):
         self.downloader.cancel()

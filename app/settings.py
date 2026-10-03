@@ -14,6 +14,7 @@ DEFAULTS = {
     "auto_open_folder": True,
     "auto_copy_clipboard": True,
     "play_complete_sound": True,
+    "save_thumbnail": False,
 }
 
 

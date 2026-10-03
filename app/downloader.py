@@ -23,7 +23,10 @@ _TMP_DIR = app_data_dir() / "tmp"
 _TMP_DIR.mkdir(parents=True, exist_ok=True)
 tempfile.tempdir = str(_TMP_DIR)
 
-KIND_OPTIONS = ["映像+音声", "映像のみ", "音声のみ"]
+KIND_THUMBNAIL_ONLY = "サムネイルのみ"
+KIND_OPTIONS = ["映像+音声", "映像のみ", "音声のみ", KIND_THUMBNAIL_ONLY]
+# サムネイルはYouTubeだと既定でwebpのため、扱いやすいjpgへ同梱ffmpegで変換する
+THUMBNAIL_FORMAT = "jpg"
 QUALITY_OPTIONS = ["最高品質", "1080p", "720p", "480p"]
 VIDEO_CONTAINER_OPTIONS = ["mp4", "mkv"]
 AUDIO_CONTAINER_OPTIONS = ["mp3", "wav", "m4a"]
@@ -94,11 +97,20 @@ def is_audio_only(kind: str) -> bool:
     return kind == "音声のみ"
 
 
+def is_thumbnail_only(kind: str) -> bool:
+    return kind == KIND_THUMBNAIL_ONLY
+
+
 def container_options_for_kind(kind: str) -> list:
+    if is_thumbnail_only(kind):
+        return [THUMBNAIL_FORMAT]
     return AUDIO_CONTAINER_OPTIONS if is_audio_only(kind) else VIDEO_CONTAINER_OPTIONS
 
 
 def build_format_and_postprocessors(kind: str, quality: str, container: str):
+    if is_thumbnail_only(kind):
+        return None, [], None
+
     if is_audio_only(kind):
         format_str = "bestaudio/best"
         postprocessors = [
@@ -189,13 +201,15 @@ class Downloader:
             raise DownloadCancelled("ユーザーによりキャンセルされました")
         self.progress_queue.put(("progress", _normalize_progress(d)))
 
-    def _build_download_opts(self, url_output, kind, quality, container, is_playlist, player_client):
+    def _build_download_opts(
+        self, url_output, kind, quality, container, is_playlist, player_client, save_thumbnail=False
+    ):
         format_str, postprocessors, merge_format = build_format_and_postprocessors(kind, quality, container)
+        thumbnail_only = is_thumbnail_only(kind)
 
         opts = common_opts(player_client)
         opts.update(
             {
-                "format": format_str,
                 "outtmpl": url_output,
                 "postprocessors": postprocessors,
                 "progress_hooks": [self._progress_hook],
@@ -203,11 +217,29 @@ class Downloader:
                 "ignoreerrors": is_playlist,
             }
         )
+        if format_str:
+            opts["format"] = format_str
         if merge_format:
             opts["merge_output_format"] = merge_format
+        if thumbnail_only or save_thumbnail:
+            opts["writethumbnail"] = True
+            opts["postprocessors"] = list(postprocessors) + [
+                {"key": "FFmpegThumbnailsConvertor", "format": THUMBNAIL_FORMAT, "when": "before_dl"}
+            ]
+        if thumbnail_only:
+            opts["skip_download"] = True
         return opts
 
-    def download(self, url: str, output_dir: str, kind: str, quality: str, container: str, is_playlist: bool):
+    def download(
+        self,
+        url: str,
+        output_dir: str,
+        kind: str,
+        quality: str,
+        container: str,
+        is_playlist: bool,
+        save_thumbnail: bool = False,
+    ):
         self.reset_cancel()
 
         if is_playlist:
@@ -221,7 +253,9 @@ class Downloader:
                 self.progress_queue.put(("cancelled", None))
                 return
 
-            opts = self._build_download_opts(outtmpl, kind, quality, container, is_playlist, player_client)
+            opts = self._build_download_opts(
+                outtmpl, kind, quality, container, is_playlist, player_client, save_thumbnail
+            )
             try:
                 with yt_dlp.YoutubeDL(opts) as ydl:
                     info = ydl.extract_info(url, download=True)
@@ -271,5 +305,10 @@ class Downloader:
             for requested in entry.get("requested_downloads") or []:
                 filepath = requested.get("filepath")
                 if filepath and Path(filepath).exists():
+                    files.append(filepath)
+            # 保存されたサムネイルは書き出した1枚にだけfilepathが付く(変換後のjpgのパス)
+            for thumb in entry.get("thumbnails") or []:
+                filepath = thumb.get("filepath")
+                if filepath and Path(filepath).exists() and filepath not in files:
                     files.append(filepath)
         return files
