@@ -25,7 +25,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from app.clipboard import copy_files_to_clipboard
 from app.downloader import (
     KIND_OPTIONS,
+    KIND_THUMBNAIL_ONLY,
     QUALITY_OPTIONS,
+    THUMBNAIL_FORMAT,
     Downloader,
     container_options_for_kind,
     is_audio_only,
@@ -37,7 +39,7 @@ from app.settings import load_settings, save_settings
 from app.sound import play_complete_sound
 from app.winutil import is_admin, relaunch_as_admin
 
-APP_VERSION = "v1.7.0"
+APP_VERSION = "v1.7.1"
 
 ICON_PATH = (
     Path(sys._MEIPASS) / "assets" / "icons" / "rounded_y_logo.ico"
@@ -168,6 +170,11 @@ class App(ctk.CTk):
             command=self._cancel_download, state="disabled"
         )
         self.cancel_button.pack(side="left", padx=(8, 0))
+        self.thumbnail_button = ctk.CTkButton(
+            action_frame, text="サムネイルをダウンロード", font=self.font_normal,
+            command=lambda: self._start_download(thumbnail_only=True)
+        )
+        self.thumbnail_button.pack(side="left", padx=(8, 0))
 
         progress_frame = ctk.CTkFrame(self)
         progress_frame.pack(fill="x", **pad)
@@ -342,9 +349,10 @@ class App(ctk.CTk):
     def _set_downloading_state(self, downloading: bool):
         self.is_downloading = downloading
         self.download_button.configure(state="disabled" if downloading else "normal")
+        self.thumbnail_button.configure(state="disabled" if downloading else "normal")
         self.cancel_button.configure(state="normal" if downloading else "disabled")
 
-    def _start_download(self):
+    def _start_download(self, thumbnail_only: bool = False):
         url = self.url_entry.get().strip()
         if not url:
             self._log("URLを入力してください")
@@ -361,18 +369,23 @@ class App(ctk.CTk):
         quality = self.quality_var.get()
         container = self.container_var.get()
 
+        # 設定には画面で選んでいる種別・画質・形式を保存する(ボタン経由の上書きは保存しない)
         self.settings.update({"output_dir": output_dir, "kind": kind, "quality": quality, "container": container})
         save_settings(self.settings)
+
+        save_thumbnail = self.save_thumbnail_var.get()
+        if thumbnail_only:
+            # 「サムネイルをダウンロード」ボタン: 画面の種別選択に関わらずサムネイルだけをjpgで保存する
+            kind, container, save_thumbnail = KIND_THUMBNAIL_ONLY, THUMBNAIL_FORMAT, False
         self.current_output_dir = output_dir
         self._pending_meta = {"url": url, "kind": kind, "quality": quality, "container": container, "title": None}
 
         self.progress_bar.set(0)
         self.percent_label.configure(text="0%")
         self.status_label.configure(text="情報を取得中...")
-        self._log(f"ダウンロード開始: {url}")
+        self._log(f"{'サムネイルのダウンロード' if thumbnail_only else 'ダウンロード'}開始: {url}")
         self._set_downloading_state(True)
 
-        save_thumbnail = self.save_thumbnail_var.get()
         thread = threading.Thread(
             target=self._worker, args=(url, output_dir, kind, quality, container, save_thumbnail), daemon=True
         )
